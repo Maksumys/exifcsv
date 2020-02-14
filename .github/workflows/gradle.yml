@@ -19,5 +19,5 @@ jobs:
       run: ./gradlew assemble
     - uses: actions/upload-artifact@v1
       with:
-        name: exif_ro_csv
-        path: app/build/exifdata.jar
+        name: exif_to_csv
+        path: build/exifdata.jar
