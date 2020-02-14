@@ -4,12 +4,15 @@ import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 
 public class Main {
 
@@ -37,14 +40,15 @@ public class Main {
             photoData.put(tag.getTagName(), new ArrayList<>());
           }
 
-          var exifList = photoData.get(tag.getTagName());
+          var tagName = tag.getTagName();
+
+          var exifList = photoData.get(tagName);
 
           if (exifList.size() != countIter) {
             System.out.println("OOPS!!!! this is bug!!! ptuk!");
-            throw new Exception("OOPS!!!! this is bug!!! ptuk!");
+          } else {
+            exifList.add(tag.getDescription());
           }
-
-          exifList.add(tag.getDescription());
         }
 
         if (directory.hasErrors()) {
@@ -59,13 +63,31 @@ public class Main {
       int finalCountIter = countIter;
 
       photoData.forEach((k, v) -> {
-        if( v.size() != finalCountIter) {
+        if (v.size() != finalCountIter) {
           v.add(" ");
         }
       });
     }
 
     return photoData;
+  }
+
+  public static void createCSVFile(HashMap<String, ArrayList<String>> photosData)
+      throws IOException {
+    FileWriter out = new FileWriter("book_new.csv");
+
+    var headers = photosData.keySet().stream().toArray(String[]::new);
+
+    var countRecords = photosData.get(headers[0]).size();
+
+    try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(headers))) {
+      for (int i = 0; i < countRecords; i++) {
+        for (var header : headers) {
+          printer.print(photosData.get(header).get(i));
+        }
+        printer.println();
+      }
+    }
   }
 
   public static void main(String[] args) throws Exception {
@@ -97,6 +119,6 @@ public class Main {
 
     var photoData = getPhotoData(lst);
 
-
+    createCSVFile(photoData);
   }
 }
