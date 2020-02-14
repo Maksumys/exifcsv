@@ -20,4 +20,4 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
         name: exif_ro_csv
-        path: app/build/exifdata.apk
+        path: app/build/exifdata.jar
