@@ -45,7 +45,7 @@ public class Main {
           var exifList = photoData.get(tagName);
 
           if (exifList.size() != countIter) {
-            System.out.println("OOPS!!!! this is bug!!! ptuk!");
+            System.out.println("OOPS!!!! Повторяющиеся данные!!");
           } else {
             exifList.add(tag.getDescription());
           }
@@ -74,7 +74,7 @@ public class Main {
 
   public static void createCSVFile(HashMap<String, ArrayList<String>> photosData)
       throws IOException {
-    FileWriter out = new FileWriter("book_new.csv");
+    FileWriter out = new FileWriter("data.csv");
 
     var headers = photosData.keySet().stream().toArray(String[]::new);
 
@@ -120,5 +120,7 @@ public class Main {
     var photoData = getPhotoData(lst);
 
     createCSVFile(photoData);
+
+    System.out.println("Файл: [" + "data.csv" + "] успешно сгенерирован! Enjoy!");
   }
 }
