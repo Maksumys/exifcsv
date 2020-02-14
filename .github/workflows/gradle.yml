@@ -17,3 +17,7 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew assemble
+    - uses: actions/upload-artifact@v1
+      with:
+        name: exif_ro_csv
+        path: app/build/exifdata.apk
