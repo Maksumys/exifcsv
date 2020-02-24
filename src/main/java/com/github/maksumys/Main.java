@@ -9,20 +9,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 public class Main {
 
-  public static HashMap<String, ArrayList<String>> getPhotoData(List<File> photos)
-      throws Exception {
-    var photoData = new HashMap<String, ArrayList<String>>();
-
-    int countIter = 0;
+  public static ArrayList<HashMap<String, String>> getPhotoData(List<File> photos) {
+    ArrayList<HashMap<String, String>> result = new ArrayList<>();
 
     for (var photo : photos) {
+      var photoData = new HashMap<String, String>();
+
       Metadata metadata;
       try {
         metadata = ImageMetadataReader.readMetadata(photo);
@@ -36,19 +37,10 @@ public class Main {
 
       for (var directory : metadata.getDirectories()) {
         for (var tag : directory.getTags()) {
-          if (!photoData.containsKey(tag.getTagName())) {
-            photoData.put(tag.getTagName(), new ArrayList<>());
+          if (photoData.containsKey(directory.getName() + "_" + tag.getTagName())) {
+            System.out.println("bug?");
           }
-
-          var tagName = tag.getTagName();
-
-          var exifList = photoData.get(tagName);
-
-          if (exifList.size() != countIter) {
-            System.out.println("OOPS!!!! Повторяющиеся данные!!");
-          } else {
-            exifList.add(tag.getDescription());
-          }
+          photoData.put(directory.getName() + "_" + tag.getTagName(), tag.getDescription());
         }
 
         if (directory.hasErrors()) {
@@ -57,33 +49,25 @@ public class Main {
           }
         }
       }
-
-      countIter++;
-
-      int finalCountIter = countIter;
-
-      photoData.forEach((k, v) -> {
-        if (v.size() != finalCountIter) {
-          v.add(" ");
-        }
-      });
+      result.add(photoData);
     }
 
-    return photoData;
+    return result;
   }
 
-  public static void createCSVFile(HashMap<String, ArrayList<String>> photosData)
-      throws IOException {
+  public static void createCSVFile(ArrayList<HashMap<String, String>> photosData) throws IOException {
     FileWriter out = new FileWriter("data.csv");
 
-    var headers = photosData.keySet().stream().toArray(String[]::new);
+    Set<String> headers = new HashSet<>();
 
-    var countRecords = photosData.get(headers[0]).size();
+    for(var photo : photosData) {
+      headers.addAll(photo.keySet());
+    }
 
-    try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(headers))) {
-      for (int i = 0; i < countRecords; i++) {
-        for (var header : headers) {
-          printer.print(photosData.get(header).get(i));
+    try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(headers.stream().toArray(String[]::new)))) {
+      for(var photo : photosData) {
+        for(var header : headers) {
+          printer.print(photo.getOrDefault(header, " "));
         }
         printer.println();
       }
