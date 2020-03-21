@@ -1,2 +1,3 @@
 rootProject.name = 'exifdata'
 
+include 'gui', 'exifcsv'

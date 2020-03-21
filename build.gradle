@@ -1,32 +1,23 @@
-plugins {
-    id 'java'
-    id 'application'
-    id 'com.github.johnrengelman.shadow' version "5.0.0"
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    group 'com.github.maksumys'
+    version '0.1'
 }
 
-mainClassName = 'com.github.maksumys.Main'
-
-group 'org.example'
-version '1.0-SNAPSHOT'
-
-sourceCompatibility = 1.11
-
-repositories {
-    mavenCentral()
-    google()
-    jcenter()
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }
 
-dependencies {
-    implementation 'com.drewnoakes:metadata-extractor:2.13.0'
-    implementation 'org.apache.commons:commons-csv:1.4'
+buildscript {
+    repositories {
+        jcenter()
+    }
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.1.0'
+    }
 }
-
-shadowJar {
-    archiveFileName = rootProject.name + '.jar'
-    destinationDirectory = file("$rootDir/build/")
-}
-
-assemble.dependsOn shadowJar
